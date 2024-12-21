@@ -1,8 +1,12 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_KEY,
-});
+let _openai = null;
+
+export function setupOpenAi() {
+  _openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
 
 /**
  * typedef {Object} Message
@@ -20,7 +24,7 @@ const openai = new OpenAI({
  * @returns {Promise<OpenAiResponse>}
  */
 export function sendMessages(messages) {
-  return openai.chat.completions.create({
+  return _openai.chat.completions.create({
     model: "gpt-4o-mini",
     store: true,
     messages,

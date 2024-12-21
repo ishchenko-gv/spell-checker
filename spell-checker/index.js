@@ -22,7 +22,7 @@ export async function checkSpelling(message) {
     },
   ];
 
-  console.log();
+  const response = await sendMessages(messages);
 
-  return sendMessages(messages);
+  return response.choices[0].message.content;
 }
