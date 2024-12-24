@@ -1,8 +1,13 @@
-import OpenAI from "openai";
+const OpenAI = require("openai");
 
 let _openai = null;
 
-export function setupOpenAi() {
+module.exports = {
+  setupOpenAi,
+  sendMessages,
+};
+
+function setupOpenAi() {
   _openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
@@ -23,7 +28,7 @@ export function setupOpenAi() {
  *
  * @returns {Promise<OpenAiResponse>}
  */
-export function sendMessages(messages) {
+function sendMessages(messages) {
   return _openai.chat.completions.create({
     model: "gpt-4o-mini",
     store: true,

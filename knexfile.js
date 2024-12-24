@@ -1,11 +1,9 @@
-import dotenv from "dotenv";
-
-dotenv.config();
+require("dotenv").config();
 
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
  */
-export default {
+module.exports = {
   test: {
     client: "postgresql",
     connection: process.env.POSTGRES_CONNECTION_TEST,

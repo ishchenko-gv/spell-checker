@@ -1,12 +1,8 @@
-import assert from "node:assert";
-import {
+const {
   checkFreeAttempts,
   // createAttemptsForUser,
   getDaysSinceLastAttempt,
-} from "../subscription/index.js";
-import "./setup.js";
-
-import { describe, it } from "node:test";
+} = require("../subscription/index.js");
 
 describe("subscription", () => {
   // it("should check free attempts in database", async () => {

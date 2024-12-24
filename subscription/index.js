@@ -1,8 +1,15 @@
-import { db } from "../db/index.js";
+const { db } = require("../db/index.js");
 
 const MAX_FREE_ATTEMPTS = 3;
 
-export function getAttemptsByUserId(userId) {
+module.exports = {
+  getAttemptsByUserId,
+  createAttemptsForUser,
+  getDaysSinceLastAttempt,
+  checkFreeAttempts,
+};
+
+function getAttemptsByUserId(userId) {
   return db
     .select("*")
     .from("free_attempts")
@@ -10,7 +17,7 @@ export function getAttemptsByUserId(userId) {
     .first();
 }
 
-export function createAttemptsForUser(userId) {
+function createAttemptsForUser(userId) {
   return db
     .insert({
       tg_user_id: userId,
@@ -21,7 +28,7 @@ export function createAttemptsForUser(userId) {
     .into("free_attempts");
 }
 
-export function getDaysSinceLastAttempt(userId) {
+function getDaysSinceLastAttempt(userId) {
   return db
     .select(db.raw("EXTRACT(DAY FROM AGE(now(), last_attempt_ts))"))
     .from("free_attempts")
@@ -31,7 +38,7 @@ export function getDaysSinceLastAttempt(userId) {
 /**
  * @param {Number} userId
  */
-export async function checkFreeAttempts(userId) {
+async function checkFreeAttempts(userId) {
   const attempts = await getAttemptsByUserId(userId);
 
   if (attempts === undefined) {

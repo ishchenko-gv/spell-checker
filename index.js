@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 
-import { setupDatabase } from "./db/index.js";
-import { setupOpenAi } from "./openai/index.js";
-import { runTelegramBot } from "./telegram/index.js";
+const { setupDatabase } = require("./db/index.js");
+const { setupOpenAi } = require("./openai/index.js");
+const { runTelegramBot } = require("./telegram/index.js");
 
 dotenv.config();
 

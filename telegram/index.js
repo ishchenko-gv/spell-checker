@@ -1,5 +1,5 @@
-import TelegramBot from "node-telegram-bot-api";
-import { checkSpelling } from "../spell-checker/index.js";
+const TelegramBot = require("node-telegram-bot-api");
+const { checkSpelling } = require("../spell-checker/index.js");
 
 let _bot;
 
@@ -8,7 +8,12 @@ const commands = {
   SUBSCRIBE_YEAR: "subscribe_year",
 };
 
-export function runTelegramBot() {
+module.exports = {
+  runTelegramBot,
+  offerSubscription,
+};
+
+function runTelegramBot() {
   const token = process.env.TELEGRAM_API_KEY;
 
   _bot = new TelegramBot(token, { polling: true });
@@ -49,7 +54,7 @@ export function runTelegramBot() {
   });
 }
 
-export function offerSubscription(msg) {
+function offerSubscription(msg) {
   const chatId = msg.chat.id;
 
   _bot.sendMessage(chatId, "Choose subscription plan:", {
