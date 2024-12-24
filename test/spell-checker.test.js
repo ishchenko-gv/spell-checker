@@ -8,10 +8,9 @@ import { checkSpelling } from "../spell-checker/index.js";
 describe("spell-checker", () => {
   it("should preform OpenAI api call", async () => {
     const response = await checkSpelling("Hello there!");
-    const content = response.choices[0].message.content;
 
-    console.log("OpenAI response:", content);
+    console.log("OpenAI response:", response);
 
-    assert.equal(typeof content, "string");
+    assert.equal(typeof response, "string");
   });
 });

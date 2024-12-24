@@ -6,6 +6,14 @@ dotenv.config();
  * @type { Object.<string, import("knex").Knex.Config> }
  */
 export default {
+  test: {
+    client: "postgresql",
+    connection: process.env.POSTGRES_CONNECTION_TEST,
+    migrations: {
+      tableName: "knex_migrations",
+    },
+  },
+
   development: {
     client: "postgresql",
     connection: process.env.POSTGRES_CONNECTION,
