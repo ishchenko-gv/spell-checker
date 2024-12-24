@@ -10,7 +10,7 @@ module.exports = {
 };
 
 function getAttemptsByUserId(userId) {
-  return db
+  return db()
     .select("*")
     .from("free_attempts")
     .where("tg_user_id", userId)
@@ -18,19 +18,19 @@ function getAttemptsByUserId(userId) {
 }
 
 function createAttemptsForUser(userId) {
-  return db
+  return db()
     .insert({
       tg_user_id: userId,
       attempts_remained: MAX_FREE_ATTEMPTS - 1,
-      last_attempt_ts: db.fn.now(),
-      updated_at: db.fn.now(),
+      last_attempt_ts: db().fn.now(),
+      updated_at: db().fn.now(),
     })
     .into("free_attempts");
 }
 
 function getDaysSinceLastAttempt(userId) {
-  return db
-    .select(db.raw("EXTRACT(DAY FROM AGE(now(), last_attempt_ts))"))
+  return db()
+    .select(db().raw("EXTRACT(DAY FROM AGE(now(), last_attempt_ts))"))
     .from("free_attempts")
     .where("tg_user_id", userId);
 }

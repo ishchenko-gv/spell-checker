@@ -14,11 +14,11 @@ function setupOpenAi() {
 }
 
 /**
- * typedef {Object} Message
+ * @typedef {Object} Message
  * @prop {("user" | "developer")} role
  * @prop {String} content
  *
- * typedef {Object} OpenAiResponse
+ * @typedef {Object} OpenAiResponse
  */
 
 /**

@@ -7,19 +7,11 @@ beforeAll(async () => {
   setupDatabase();
   setupOpenAi();
 
-  console.log("beforeAll.db", db());
-
   await db().migrate.latest();
-  // await db.migrate.rollback();
-  // await db().destroy();
 });
 
 beforeEach(async () => {
   // await db.seed.run();
-});
-
-afterEach(async () => {
-  // await db.destroy();
 });
 
 afterAll(async () => {
