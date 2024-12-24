@@ -1,8 +1,15 @@
-import globals from "globals";
-import pluginJs from "@eslint/js";
+const globals = require("globals");
+const pluginJs = require("@eslint/js");
+const jsdoc = require("eslint-plugin-jsdoc");
 
 /** @type {import('eslint').Linter.Config[]} */
-export default [
-  { languageOptions: { globals: { ...globals.node } } },
+module.exports = [
+  jsdoc.configs["flat/recommended-error"],
+  {
+    rules: {
+      "require-property-description": "off",
+    },
+  },
+  { languageOptions: { globals: { ...globals.node, ...globals.jest } } },
   pluginJs.configs.recommended,
 ];

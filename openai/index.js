@@ -14,18 +14,15 @@ function setupOpenAi() {
 }
 
 /**
- * @typedef {Object} Message
- * @prop {("user" | "developer")} role
- * @prop {String} content
+ * @typedef {object} Message
+ * @property {("user" | "developer")} role
  *
- * @typedef {Object} OpenAiResponse
+ * @property {string} content
  */
 
 /**
  * Send message to OpenAI api
- *
  * @param {Message[]} messages
- *
  * @returns {Promise<OpenAiResponse>}
  */
 function sendMessages(messages) {
