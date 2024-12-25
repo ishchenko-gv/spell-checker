@@ -42,7 +42,6 @@ function runTelegramBot() {
       return;
     }
 
-    console.log("msg:", msg);
     const userId = msg.from.id;
     const chatId = msg.chat.id;
 
