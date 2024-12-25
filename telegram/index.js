@@ -1,6 +1,13 @@
 const TelegramBot = require("node-telegram-bot-api");
 const { checkSpelling } = require("../spell-checker/index.js");
 
+/**
+ * @typedef {import('node-telegram-bot-api').TelegramBot}
+ */
+
+/**
+ * @type {TelegramBot}
+ */
 let _bot;
 
 const commands = {
@@ -13,6 +20,9 @@ module.exports = {
   offerSubscription,
 };
 
+/**
+ * Run Telegram bot instance
+ */
 function runTelegramBot() {
   const token = process.env.TELEGRAM_API_KEY;
 
@@ -54,6 +64,9 @@ function runTelegramBot() {
   });
 }
 
+/**
+ * @param {string} msg
+ */
 function offerSubscription(msg) {
   const chatId = msg.chat.id;
 
@@ -67,6 +80,10 @@ function offerSubscription(msg) {
   });
 }
 
+/**
+ * @param {number} chatId
+ * @returns {object}
+ */
 function getMonthSubscriptionInvoice(chatId) {
   return {
     chatId,
@@ -84,6 +101,10 @@ function getMonthSubscriptionInvoice(chatId) {
   };
 }
 
+/**
+ * @param {number} chatId
+ * @returns {object}
+ */
 function getYearSubscriptionInvoice(chatId) {
   return {
     chatId,

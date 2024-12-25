@@ -26,7 +26,6 @@ function setupDatabase() {
 
 /**
  * Get database instance
- *
  * @returns {Database}
  */
 function db() {

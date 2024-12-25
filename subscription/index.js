@@ -9,6 +9,14 @@ module.exports = {
   checkFreeAttempts,
 };
 
+/**
+ * @typedef {import('knex').Knex.QueryBuilder} QueryBuilder
+ */
+
+/**
+ * @param {string} userId
+ * @returns {Promise<number>}
+ */
 function getAttemptsByUserId(userId) {
   return db()
     .select("*")
@@ -17,6 +25,10 @@ function getAttemptsByUserId(userId) {
     .first();
 }
 
+/**
+ * @param {number} userId
+ * @returns {Promise<QueryBuilder>}
+ */
 function createAttemptsForUser(userId) {
   return db()
     .insert({
@@ -28,6 +40,10 @@ function createAttemptsForUser(userId) {
     .into("free_attempts");
 }
 
+/**
+ * @param {number} userId
+ * @returns {Promise<number>}
+ */
 function getDaysSinceLastAttempt(userId) {
   return db()
     .select(db().raw("EXTRACT(DAY FROM AGE(now(), last_attempt_ts))"))
@@ -36,7 +52,8 @@ function getDaysSinceLastAttempt(userId) {
 }
 
 /**
- * @param {Number} userId
+ * @param {number} userId
+ * @returns {void}
  */
 async function checkFreeAttempts(userId) {
   const attempts = await getAttemptsByUserId(userId);

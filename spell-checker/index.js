@@ -11,8 +11,8 @@ module.exports = {
 };
 
 /**
- * @param {String} message
- * @returns {Promise<String>}
+ * @param {string} message
+ * @returns {Promise<string>}
  */
 async function checkSpelling(message) {
   const messages = [

@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 /**
- * @type { Object.<string, import("knex").Knex.Config> }
+ * @type { {[key: string]: import("knex").Knex.Config} }
  */
 module.exports = {
   test: {
