@@ -1,4 +1,5 @@
 const dal = require("./dal");
+const { AppError, ErrorCodes } = require("../errors");
 
 module.exports = {
   checkFreeAttempts,
@@ -37,8 +38,15 @@ async function validatePlanSlug(slug) {
 /**
  * @param {number} userId
  * @param {string} planSlug
+ * @throws {AppError}
  */
 async function subscribeUser(userId, planSlug) {
+  const isUserSubscribed = await checkUserSubscription(userId);
+
+  if (isUserSubscribed) {
+    throw new AppError(ErrorCodes.SUBSCRIPTION_EXISTS);
+  }
+
   const plan = await dal.getPlanBySlug(planSlug);
   await dal.createUserSubscription(userId, plan.id, plan.duration_months);
 }

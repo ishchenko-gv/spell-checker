@@ -7,6 +7,7 @@ const {
   subscribeUser,
   checkUserSubscription,
 } = require("../subscription");
+const { ErrorCodes } = require("../errors");
 
 /**
  * @typedef {import('node-telegram-bot-api').TelegramBot} TelegramBot
@@ -142,7 +143,15 @@ async function handleSuccessfulPayment(msg) {
   const userId = msg.from.id;
   const planSlug = msg.successful_payment.invoice_payload;
 
-  await subscribeUser(userId, planSlug);
+  try {
+    await subscribeUser(userId, planSlug);
+  } catch (err) {
+    if (err.code === ErrorCodes.SUBSCRIPTION_EXISTS) {
+      _bot.sendMessage(userId, "You've already subscribed!");
+    } else {
+      console.error(err);
+    }
+  }
 }
 
 /**
