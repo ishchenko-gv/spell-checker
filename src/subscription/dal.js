@@ -24,8 +24,6 @@ async function getAttemptsByUserId(userId) {
     .where("tg_user_id", userId)
     .first();
 
-  console.log("getAttemptsByUserId.result", result);
-
   if (!result) {
     return -1;
   }
@@ -67,11 +65,7 @@ async function getDaysSinceLastAttempt(userId) {
     return 0;
   }
 
-  const extracted = Number(result.extract);
-
-  console.log("getDaysSinceLastAttempt.extracted", extracted);
-
-  return extracted;
+  return Number(result.extract);
 }
 
 /**
