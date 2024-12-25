@@ -40,7 +40,6 @@ async function validatePlanSlug(slug) {
  */
 async function subscribeUser(userId, planSlug) {
   const plan = await dal.getPlanBySlug(planSlug);
-
   await dal.createUserSubscription(userId, plan.id, plan.duration_months);
 }
 
@@ -50,5 +49,12 @@ async function subscribeUser(userId, planSlug) {
  */
 async function checkUserSubscription(userId) {
   const subscription = await dal.getSubscriptionByUser(userId);
-  console.log("checkUserSubscription", subscription);
+
+  console.log(subscription);
+
+  if (!subscription || !subscription.end_date) {
+    return false;
+  }
+
+  return new Date() < subscription.end_date;
 }

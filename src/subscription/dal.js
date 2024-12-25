@@ -57,7 +57,11 @@ async function createAttemptsForUser(userId) {
  */
 async function getDaysSinceLastAttempt(userId) {
   const result = await db()
-    .select(db().raw("EXTRACT(DAY FROM AGE(now(), last_attempt_ts))"))
+    .select(
+      db().raw(
+        "extract(day from date_trunc('day', now()) - date_trunc('day', last_attempt_ts))"
+      )
+    )
     .from("free_attempts")
     .where("tg_user_id", userId)
     .first();
@@ -106,7 +110,10 @@ async function createUserSubscription(userId, planId, months) {
     .insert({
       tg_user_id: userId,
       plan_id: planId,
-      end_date: db().raw(`CURRENT_TIMESTAMP + interval '?? months'`, [months]),
+      end_date: db().raw(
+        `date_trunc('day', CURRENT_TIMESTAMP + interval '?? months')`,
+        [months]
+      ),
       updated_at: db().fn.now(),
     })
     .into("subscriptions");
@@ -114,9 +121,9 @@ async function createUserSubscription(userId, planId, months) {
 
 /**
  * @param {number} userId
- * @returns {object}
+ * @returns {Promise<object | undefined>}
  */
-async function getSubscriptionByUser(userId) {
+function getSubscriptionByUser(userId) {
   return db()
     .select()
     .from("subscriptions")

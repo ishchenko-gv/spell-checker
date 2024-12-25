@@ -5,6 +5,7 @@ const {
   checkFreeAttempts,
   validatePlanSlug,
   subscribeUser,
+  checkUserSubscription,
 } = require("../subscription");
 
 /**
@@ -45,6 +46,11 @@ function runTelegramBot() {
 
   if (process.env.NODE_ENV === "development") {
     _bot.onText(/\/test_offer/, offerSubscription);
+    _bot.onText(/\/test_subscribe/, (msg) => {
+      const userId = msg.from.id;
+      subscribeUser(userId, "month_plan");
+      _bot.sendMessage(userId, "You've been subscribed for 1 month!");
+    });
   }
 }
 
@@ -60,11 +66,20 @@ async function handleMessage(msg) {
   const userId = msg.from.id;
   const chatId = msg.chat.id;
 
-  const freeAttemptsRemained = await checkFreeAttempts(userId);
+  try {
+    const isUserSubscribed = await checkUserSubscription(userId);
 
-  if (!freeAttemptsRemained) {
-    offerSubscription(msg);
-    return;
+    if (!isUserSubscribed) {
+      const freeAttemptsRemained = await checkFreeAttempts(userId);
+
+      if (!freeAttemptsRemained) {
+        offerSubscription(msg);
+        return;
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    _bot.sendMessage(chatId, "Something went wrong. Couldn't read message");
   }
 
   const answer = await checkSpelling(msg.text);

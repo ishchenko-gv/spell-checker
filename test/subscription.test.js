@@ -22,10 +22,11 @@ describe("subscription", () => {
 
   it("should subscribe user", async () => {
     const userId = getRandomUserId();
-    const subscription = await subscribeUser(userId, "month_plan");
 
-    console.info("test/subscription.subscription", subscription);
-    await checkUserSubscription(userId);
+    await subscribeUser(userId, "month_plan");
+    const isUserSubscribed = await checkUserSubscription(userId);
+
+    expect(isUserSubscribed).toBe(true);
   });
 });
 
