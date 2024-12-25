@@ -42,9 +42,11 @@ function runTelegramBot() {
       return;
     }
 
+    console.log("msg:", msg);
+    const userId = msg.from.id;
     const chatId = msg.chat.id;
 
-    const freeAttemptsRemained = await checkFreeAttempts(chatId);
+    const freeAttemptsRemained = await checkFreeAttempts(userId);
 
     if (!freeAttemptsRemained) {
       offerSubscription(msg);
