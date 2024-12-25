@@ -1,9 +1,9 @@
-const { db, setupDatabase } = require("../db");
-const { setupOpenAi } = require("../openai");
+require("dotenv").config();
+
+const { db, setupDatabase } = require("../src/db");
+const { setupOpenAi } = require("../src/openai");
 
 beforeAll(async () => {
-  require("dotenv").config();
-
   setupDatabase();
   setupOpenAi();
 
