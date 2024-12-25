@@ -1,6 +1,6 @@
 const knex = require("knex");
 
-const knexConfig = require("../knexfile.js");
+const knexConfig = require("../../knexfile.js");
 
 /**
  * @typedef {import("knex").Knex} Database
@@ -20,8 +20,7 @@ module.exports = {
  * Define database instance
  */
 function setupDatabase() {
-  _db = knex(knexConfig[process.env.NODE_ENV]);
-  console.log("setupDatabase.db", db, process.env.NODE_ENV);
+  _db = knex(knexConfig[process.env.NODE_ENV || "development"]);
 }
 
 /**

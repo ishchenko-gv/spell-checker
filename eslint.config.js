@@ -15,7 +15,6 @@ module.exports = [
       "jsdoc/require-param-description": "off",
       "jsdoc/require-returns-description": "off",
     },
-    // plugins: ["jsdoc"],
   },
   { languageOptions: { globals: { ...globals.node, ...globals.jest } } },
   pluginJs.configs.recommended,
