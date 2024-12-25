@@ -17,12 +17,18 @@ module.exports = {
  * @param {string} userId
  * @returns {Promise<number>}
  */
-function getAttemptsByUserId(userId) {
-  return db()
+async function getAttemptsByUserId(userId) {
+  const result = await db()
     .select("*")
     .from("free_attempts")
     .where("tg_user_id", userId)
     .first();
+
+  if (!result) {
+    return;
+  }
+
+  return result.attempts_remained;
 }
 
 /**
@@ -44,23 +50,53 @@ function createAttemptsForUser(userId) {
  * @param {number} userId
  * @returns {Promise<number>}
  */
-function getDaysSinceLastAttempt(userId) {
-  return db()
+async function getDaysSinceLastAttempt(userId) {
+  const result = await db()
     .select(db().raw("EXTRACT(DAY FROM AGE(now(), last_attempt_ts))"))
     .from("free_attempts")
-    .where("tg_user_id", userId);
+    .where("tg_user_id", userId)
+    .first();
+
+  console.info("typeof result.extract", typeof result.extract);
+
+  if (!result) {
+    return 0;
+  }
+
+  return Number(result.extract);
 }
 
 /**
  * @param {number} userId
- * @returns {void}
+ * @returns {Promise<void>}
+ */
+function decrementFreeAttempts(userId) {
+  return db()
+    .select()
+    .from("free_attempts")
+    .where("tg_user_id", userId)
+    .decrement("attempts_remained");
+}
+
+/**
+ * @param {number} userId
+ * @returns {Promise<number>} amount of free attempts remained
  */
 async function checkFreeAttempts(userId) {
   const attempts = await getAttemptsByUserId(userId);
 
-  if (attempts === undefined) {
+  if (attempts === undefined || (await getDaysSinceLastAttempt(userId)) > 0) {
     await createAttemptsForUser(userId);
+    return MAX_FREE_ATTEMPTS - 1;
   }
 
   console.log("checkFreeAttempts.attempts", attempts);
+
+  if (!attempts) {
+    return 0;
+  }
+
+  await decrementFreeAttempts(userId);
+
+  return attempts;
 }

@@ -1,5 +1,6 @@
 const TelegramBot = require("node-telegram-bot-api");
 const { checkSpelling } = require("../spell-checker");
+const { checkFreeAttempts } = require("../subscription");
 
 /**
  * @typedef {import('node-telegram-bot-api').TelegramBot}
@@ -42,6 +43,14 @@ function runTelegramBot() {
     }
 
     const chatId = msg.chat.id;
+
+    const freeAttemptsRemained = await checkFreeAttempts(chatId);
+
+    if (!freeAttemptsRemained) {
+      offerSubscription(msg);
+      return;
+    }
+
     const answer = await checkSpelling(msg.text);
 
     _bot.sendMessage(chatId, answer);
