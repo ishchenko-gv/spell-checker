@@ -2,6 +2,9 @@ const dal = require("./dal");
 
 module.exports = {
   checkFreeAttempts,
+  validatePlanSlug,
+  subscribeUser,
+  checkUserSubscription,
 };
 
 /**
@@ -20,4 +23,32 @@ async function checkFreeAttempts(userId) {
   }
 
   return dal.decrementFreeAttempts(userId);
+}
+
+/**
+ * @param {string} slug
+ * @returns {Promise<boolean>}
+ */
+async function validatePlanSlug(slug) {
+  const plan = await dal.getPlanBySlug(slug);
+  return !!plan;
+}
+
+/**
+ * @param {number} userId
+ * @param {string} planSlug
+ */
+async function subscribeUser(userId, planSlug) {
+  const plan = await dal.getPlanBySlug(planSlug);
+
+  await dal.createUserSubscription(userId, plan.id, plan.duration_months);
+}
+
+/**
+ * @param {number} userId
+ * @returns {Promise<boolean>}
+ */
+async function checkUserSubscription(userId) {
+  const subscription = await dal.getSubscriptionByUser(userId);
+  console.log("checkUserSubscription", subscription);
 }

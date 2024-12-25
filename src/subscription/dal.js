@@ -7,6 +7,9 @@ module.exports = {
   createAttemptsForUser,
   getDaysSinceLastAttempt,
   decrementFreeAttempts,
+  getPlanBySlug,
+  createUserSubscription,
+  getSubscriptionByUser,
 };
 
 /**
@@ -82,4 +85,41 @@ async function decrementFreeAttempts(userId) {
   }
 
   return result[0].attempts_remained;
+}
+
+/**
+ * @param {string} slug
+ * @returns {Promise<object>}
+ */
+function getPlanBySlug(slug) {
+  return db().select().from("plans").where("slug", slug).first();
+}
+
+/**
+ * @param {number} userId
+ * @param {number} planId
+ * @param {number} months
+ * @returns {Promise<void>}
+ */
+async function createUserSubscription(userId, planId, months) {
+  await db()
+    .insert({
+      tg_user_id: userId,
+      plan_id: planId,
+      end_date: db().raw(`CURRENT_TIMESTAMP + interval '?? months'`, [months]),
+      updated_at: db().fn.now(),
+    })
+    .into("subscriptions");
+}
+
+/**
+ * @param {number} userId
+ * @returns {object}
+ */
+async function getSubscriptionByUser(userId) {
+  return db()
+    .select()
+    .from("subscriptions")
+    .where("tg_user_id", userId)
+    .first();
 }

@@ -11,6 +11,7 @@ exports.seed = async function (knex) {
       updated_at: knex.fn.now(),
       duration_months: 1,
       price_tg_stars: 10,
+      slug: "month_plan",
     },
     {
       id: 2,
@@ -18,6 +19,7 @@ exports.seed = async function (knex) {
       updated_at: knex.fn.now(),
       duration_months: 10,
       price_tg_stars: 100,
+      slug: "year_plan",
     },
   ]);
 };
