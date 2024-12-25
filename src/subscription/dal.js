@@ -36,18 +36,16 @@ async function getAttemptsByUserId(userId) {
  * @returns {Promise<number>}
  */
 async function createAttemptsForUser(userId) {
-  const attemptsRemained = MAX_FREE_ATTEMPTS - 1;
-
   await db()
     .insert({
       tg_user_id: userId,
-      attempts_remained: attemptsRemained,
+      attempts_remained: MAX_FREE_ATTEMPTS,
       last_attempt_ts: db().fn.now(),
       updated_at: db().fn.now(),
     })
     .into("free_attempts");
 
-  return attemptsRemained;
+  return MAX_FREE_ATTEMPTS;
 }
 
 /**

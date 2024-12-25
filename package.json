@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "npx nodemon src/index.js",
+    "dev": "NODE_ENV=development npx nodemon src/index.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "eslint src/**/*.js"

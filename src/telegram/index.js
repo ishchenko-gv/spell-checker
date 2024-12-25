@@ -27,7 +27,10 @@ module.exports = {
 function runTelegramBot() {
   const token = process.env.TELEGRAM_API_KEY;
 
-  _bot = new TelegramBot(token, { polling: true });
+  _bot = new TelegramBot(token, {
+    testEnvironment: process.env.NODE_ENV === "development",
+    polling: true,
+  });
 
   _bot.on("polling_error", (error) => {
     console.log(`[polling_error] ${error.code}: ${error.message}`);
