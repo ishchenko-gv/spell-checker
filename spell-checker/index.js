@@ -1,4 +1,4 @@
-const { sendMessages } = require("../openai/index.js");
+const { sendMessages } = require("../openai");
 
 const BEHAVIOR_PROMPT = `
 You are a spell checking assistant.

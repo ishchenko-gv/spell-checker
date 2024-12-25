@@ -1,4 +1,4 @@
-const { db } = require("../db/index.js");
+const { db } = require("../db");
 
 const MAX_FREE_ATTEMPTS = 3;
 

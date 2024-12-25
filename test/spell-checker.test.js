@@ -1,4 +1,4 @@
-const { checkSpelling } = require("../spell-checker/index.js");
+const { checkSpelling } = require("../spell-checker");
 
 describe("spell-checker", () => {
   it("should preform OpenAI api call", async () => {

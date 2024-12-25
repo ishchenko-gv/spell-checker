@@ -1,5 +1,5 @@
 const TelegramBot = require("node-telegram-bot-api");
-const { checkSpelling } = require("../spell-checker/index.js");
+const { checkSpelling } = require("../spell-checker");
 
 /**
  * @typedef {import('node-telegram-bot-api').TelegramBot}

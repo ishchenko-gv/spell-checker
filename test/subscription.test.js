@@ -2,7 +2,7 @@ const {
   checkFreeAttempts,
   // createAttemptsForUser,
   getDaysSinceLastAttempt,
-} = require("../subscription/index.js");
+} = require("../subscription");
 
 describe("subscription", () => {
   it("should check free attempts in database", async () => {
