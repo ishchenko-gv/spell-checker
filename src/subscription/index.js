@@ -58,7 +58,7 @@ async function subscribeUser(userId, planSlug) {
 async function checkUserSubscription(userId) {
   const subscription = await dal.getSubscriptionByUser(userId);
 
-  console.log(subscription);
+  console.log("checkUserSubscription.subscription", subscription);
 
   if (!subscription || !subscription.end_date) {
     return false;

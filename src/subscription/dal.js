@@ -128,5 +128,6 @@ function getSubscriptionByUser(userId) {
     .select()
     .from("subscriptions")
     .where("tg_user_id", userId)
+    .orderBy("end_date", "desc")
     .first();
 }

@@ -47,10 +47,13 @@ function runTelegramBot() {
 
   if (process.env.NODE_ENV === "development") {
     _bot.onText(/\/test_offer/, offerSubscription);
+
     _bot.onText(/\/test_subscribe/, (msg) => {
-      const userId = msg.from.id;
-      subscribeUser(userId, "month_plan");
-      _bot.sendMessage(userId, "You've been subscribed for 1 month!");
+      msg.successful_payment = {
+        invoice_payload: "month_plan",
+      };
+
+      handleSuccessfulPayment(msg);
     });
   }
 }
@@ -145,9 +148,10 @@ async function handleSuccessfulPayment(msg) {
 
   try {
     await subscribeUser(userId, planSlug);
+    _bot.sendMessage("You've been subscribed successfully!");
   } catch (err) {
     if (err.code === ErrorCodes.SUBSCRIPTION_EXISTS) {
-      _bot.sendMessage(userId, "You've already subscribed!");
+      _bot.sendMessage(userId, "You're already subscribed!");
     } else {
       console.error(err);
     }
