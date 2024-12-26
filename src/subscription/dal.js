@@ -10,10 +10,21 @@ module.exports = {
   getPlanBySlug,
   createUserSubscription,
   getSubscriptionByUser,
+  createPayment,
 };
 
 /**
  * @typedef {import('knex').Knex.QueryBuilder} QueryBuilder
+ */
+
+/**
+ * @typedef {object} Payment
+ * @property {number} userId
+ * @property {string} status
+ * @property {string} subject
+ * @property {string} currency
+ * @property {number} amount
+ * @property {object} details
  */
 
 /**
@@ -130,4 +141,30 @@ function getSubscriptionByUser(userId) {
     .where("tg_user_id", userId)
     .orderBy("end_date", "desc")
     .first();
+}
+
+/**
+ * @param {Payment} payment
+ * @returns {Promise<number>}
+ */
+async function createPayment(payment) {
+  const result = await db()
+    .insert({
+      tg_user_id: payment.userId,
+      status: payment.status,
+      subject: payment.subject,
+      currency: payment.currency,
+      amount: payment.amount,
+      details: payment.details,
+    })
+    .into("payments")
+    .returning("id");
+
+  console.log("createPayment.result", result);
+
+  if (!result?.[0]?.id) {
+    return -1;
+  }
+
+  return result[0].id;
 }

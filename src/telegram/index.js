@@ -8,6 +8,7 @@ const {
   checkUserSubscription,
 } = require("../subscription");
 const { ErrorCodes } = require("../errors");
+const { createPayment } = require("../subscription/dal");
 
 /**
  * @typedef {import('node-telegram-bot-api').TelegramBot} TelegramBot
@@ -50,7 +51,11 @@ function runTelegramBot() {
 
     _bot.onText(/\/test_subscribe/, (msg) => {
       msg.successful_payment = {
+        id: 1,
+        telegram_payment_charge_id: 2,
         invoice_payload: "month_plan",
+        currency: "XTR",
+        total_amount: 100,
       };
 
       handleSuccessfulPayment(msg);
@@ -124,16 +129,38 @@ function handleCallbackQuery(callbackQuery) {
  * @param {TelegramBot.PreCheckoutQuery} query
  * @returns {void}
  */
-function handlePrecheckoutQuery(query) {
-  const chatId = query.from.id;
+async function handlePrecheckoutQuery(query) {
+  const userId = query.from.id;
+  const chatId = query.chat.id;
   const planSlug = query.invoice_payload;
 
   if (!validatePlanSlug(planSlug)) {
+    await createPayment({
+      userId,
+      status: "pre_checkout_failed",
+      subject: "subscription",
+      currency: query.currency,
+      amount: query.total_amount,
+      details: {
+        pre_checkout_id: query.id,
+      },
+    });
     _bot.answerPreCheckoutQuery(query.id, false);
     _bot.sendMessage(chatId, "Something went wrong. You've not been charged");
     console.error("Invalid plan slug:", planSlug);
     return;
   }
+
+  await createPayment({
+    userId,
+    status: "pre_checkout_success",
+    subject: "subscription",
+    currency: query.currency,
+    amount: query.total_amount,
+    details: {
+      pre_checkout_id: query.id,
+    },
+  });
 
   _bot.answerPreCheckoutQuery(query.id, true);
 }
@@ -144,15 +171,33 @@ function handlePrecheckoutQuery(query) {
  */
 async function handleSuccessfulPayment(msg) {
   const userId = msg.from.id;
+  const chatId = msg.chat.id;
   const planSlug = msg.successful_payment.invoice_payload;
 
   try {
+    const paymentId = await createPayment({
+      userId,
+      status: "success",
+      subject: "subscription",
+      currency: msg.successful_payment.currency,
+      amount: msg.successful_payment.total_amount,
+      details: {
+        charge_id: msg.successful_payment.telegram_payment_charge_id,
+      },
+    });
+
+    console.log("successful payment id:", paymentId);
+
     await subscribeUser(userId, planSlug);
     _bot.sendMessage("You've been subscribed successfully!");
   } catch (err) {
     if (err.code === ErrorCodes.SUBSCRIPTION_EXISTS) {
-      _bot.sendMessage(userId, "You're already subscribed!");
+      _bot.sendMessage(chatId, "You're already subscribed!");
     } else {
+      _bot.sendMessage(
+        chatId,
+        "Something went wrong. Couldn't process payment"
+      );
       console.error(err);
     }
   }
