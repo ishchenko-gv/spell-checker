@@ -114,13 +114,15 @@ function getPlanBySlug(slug) {
  * @param {number} userId
  * @param {number} planId
  * @param {number} months
+ * @param {number} paymentId
  * @returns {Promise<void>}
  */
-async function createUserSubscription(userId, planId, months) {
+async function createUserSubscription(userId, planId, months, paymentId) {
   await db()
     .insert({
       tg_user_id: userId,
       plan_id: planId,
+      payment_id: paymentId,
       end_date: db().raw(
         `date_trunc('day', CURRENT_TIMESTAMP + interval '?? months')`,
         [months]

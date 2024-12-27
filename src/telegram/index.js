@@ -7,7 +7,6 @@ const {
   subscribeUser,
   checkUserSubscription,
 } = require("../subscription");
-const { ErrorCodes } = require("../errors");
 const { createPayment } = require("../subscription/dal");
 
 /**
@@ -143,6 +142,7 @@ async function handlePrecheckoutQuery(query) {
       amount: query.total_amount,
       details: {
         pre_checkout_id: query.id,
+        error: `Invalid plan slug: ${planSlug}`,
       },
     });
     _bot.answerPreCheckoutQuery(query.id, false);
@@ -186,20 +186,11 @@ async function handleSuccessfulPayment(msg) {
       },
     });
 
-    console.log("successful payment id:", paymentId);
-
-    await subscribeUser(userId, planSlug);
-    _bot.sendMessage("You've been subscribed successfully!");
+    await subscribeUser(userId, planSlug, paymentId);
+    _bot.sendMessage(chatId, "You've been subscribed successfully!");
   } catch (err) {
-    if (err.code === ErrorCodes.SUBSCRIPTION_EXISTS) {
-      _bot.sendMessage(chatId, "You're already subscribed!");
-    } else {
-      _bot.sendMessage(
-        chatId,
-        "Something went wrong. Couldn't process payment"
-      );
-      console.error(err);
-    }
+    console.error(err);
+    _bot.sendMessage(chatId, "Something went wrong. Couldn't process payment");
   }
 }
 
