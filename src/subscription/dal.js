@@ -149,8 +149,6 @@ async function createPayment(payment) {
     .into("payments")
     .returning("id");
 
-  console.log("createPayment.result", result);
-
   if (!result?.[0]?.id) {
     return -1;
   }

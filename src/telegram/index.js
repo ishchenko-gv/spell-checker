@@ -96,7 +96,7 @@ async function handleMessage(msg) {
  */
 function createErrorHandler(errorName) {
   return (error) => {
-    console.log(`[${errorName}] ${error.code}: ${error.message}`);
+    console.error(`[${errorName}] ${error.code}: ${error.message}`);
   };
 }
 
