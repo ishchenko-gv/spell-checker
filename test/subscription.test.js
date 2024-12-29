@@ -4,6 +4,7 @@ const {
   subscribeUser,
   checkUserSubscription,
 } = require("../src/subscription");
+const { getRandomUserId } = require("./utils");
 
 describe("subscription", () => {
   it("should create attempts for user", async () => {
@@ -24,15 +25,9 @@ describe("subscription", () => {
     const userId = getRandomUserId();
 
     await subscribeUser(userId, "month_plan");
+
     const isUserSubscribed = await checkUserSubscription(userId);
 
     expect(isUserSubscribed).toBe(true);
   });
 });
-
-/**
- * @returns {number}
- */
-function getRandomUserId() {
-  return Number.parseInt(Math.random() * 1000000);
-}
