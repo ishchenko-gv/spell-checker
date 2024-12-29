@@ -5,6 +5,7 @@ const {
   setUserLang,
   getUserConfig,
   setUserLangLevel,
+  setUserFormality,
 } = require("../spell-checker");
 const {
   checkFreeAttempts,
@@ -13,18 +14,17 @@ const {
   checkUserSubscription,
 } = require("../subscription");
 const { createPayment } = require("../subscription/dal");
+const commands = require("./commands");
+const keyboards = require("./keyboards");
 const languages = require("../spell-checker/languages");
+const langLevels = require("../spell-checker/lang-levels");
+const formalities = require("../spell-checker/formalities");
+// const formalities = require("../spell-checker/formalities");
 
 /**
  * @type {TelegramBot}
  */
 let _bot;
-
-const commands = {
-  SUBSCRIBE: "subscribe",
-  CHANGE_LANG: "change-lang",
-  CHANGE_LANG_LEVEL: "change-lang-level",
-};
 
 module.exports = {
   runTelegramBot,
@@ -50,6 +50,7 @@ function runTelegramBot() {
   _bot.onText(/\/settings/, handleShowSettings);
   _bot.onText(/\/lang/, handleLangChange);
   _bot.onText(/\/level/, handleLangLevelChange);
+  _bot.onText(/\/formality/, handleFormalityChange);
 
   if (process.env.NODE_ENV === "development") {
     _bot.onText(/\/test_offer/, offerSubscription);
@@ -93,7 +94,7 @@ async function handleMessage(msg) {
     }
   } catch (err) {
     console.error(err);
-    _bot.sendMessage(chatId, "Something went wrong. Couldn't read message");
+    _bot.sendMessage(chatId, "❌ Something went wrong. Couldn't read message");
   }
 
   const answer = await checkSpelling(msg.text);
@@ -119,6 +120,9 @@ async function handleCallbackQuery(callbackQuery) {
   const [command, data] = callbackQuery.data.split(":");
 
   switch (command) {
+    case commands.SHOW_SETTINGS:
+      handleShowSettings(callbackQuery.message);
+      break;
     case commands.SUBSCRIBE:
       if (data === "month") {
         _bot.sendInvoice(...Object.values(getMonthSubscriptionInvoice(chatId)));
@@ -127,15 +131,55 @@ async function handleCallbackQuery(callbackQuery) {
       }
       break;
     case commands.CHANGE_LANG:
+      if (!data) {
+        handleLangChange(callbackQuery.message);
+        break;
+      }
+
       await setUserLang(chatId, data);
       _bot.sendMessage(
         chatId,
-        `The language's been set to ${languages[data].label || ""}`
+        `The language's been set to ${languages[data].label} ${languages[data].emoji}`,
+        {
+          reply_markup: {
+            inline_keyboard: keyboards.showSettings,
+          },
+        }
       );
       break;
     case commands.CHANGE_LANG_LEVEL:
+      if (!data) {
+        handleLangLevelChange(callbackQuery.message);
+        break;
+      }
+
       await setUserLangLevel(chatId, data);
-      _bot.sendMessage(chatId, `The language level's been set to ${data}`);
+      _bot.sendMessage(
+        chatId,
+        `✅ The language level's been set to ${langLevels[data].label}`,
+        {
+          reply_markup: {
+            inline_keyboard: keyboards.showSettings,
+          },
+        }
+      );
+      break;
+    case commands.CHANGE_FORMALITY:
+      if (!data) {
+        handleFormalityChange(callbackQuery.message);
+        break;
+      }
+
+      await setUserFormality(chatId, data);
+      _bot.sendMessage(
+        chatId,
+        `✅ The language formality's been set to ${formalities[data].label}`,
+        {
+          reply_markup: {
+            inline_keyboard: keyboards.showSettings,
+          },
+        }
+      );
       break;
     default:
       console.error("Unknown callback query:", command);
@@ -164,7 +208,10 @@ async function handlePrecheckoutQuery(query) {
       },
     });
     _bot.answerPreCheckoutQuery(query.id, false);
-    _bot.sendMessage(chatId, "Something went wrong. You've not been charged");
+    _bot.sendMessage(
+      chatId,
+      "❌ Something went wrong. You've not been charged"
+    );
     console.error("Invalid plan slug:", planSlug);
     return;
   }
@@ -205,10 +252,13 @@ async function handleSuccessfulPayment(msg) {
     });
 
     await subscribeUser(userId, planSlug, paymentId);
-    _bot.sendMessage(chatId, "You've been subscribed successfully!");
+    _bot.sendMessage(chatId, "✅ You've been subscribed successfully!");
   } catch (err) {
     console.error(err);
-    _bot.sendMessage(chatId, "Something went wrong. Couldn't process payment");
+    _bot.sendMessage(
+      chatId,
+      "❌ Something went wrong. Couldn't process payment"
+    );
   }
 }
 
@@ -230,17 +280,25 @@ function handleAboutMe(msg) {
  * @param {TelegramBot.Message} msg
  */
 async function handleShowSettings(msg) {
-  const userId = msg.from.id;
   const chatId = msg.chat.id;
 
-  const config = await getUserConfig(userId);
+  const config = await getUserConfig(chatId);
 
   const response = `
-Language: ${config.lang}
-Level: ${config.langLevel}
+language: ${languages[config.lang].label} ${languages[config.lang].emoji}
+level: ${langLevels[config.langLevel].label} ${
+    langLevels[config.langLevel].emoji
+  }
+formality: ${formalities[config.formality].label} ${
+    formalities[config.formality].emoji
+  }
   `;
 
-  _bot.sendMessage(chatId, response);
+  _bot.sendMessage(chatId, response, {
+    reply_markup: {
+      inline_keyboard: keyboards.changeSettings,
+    },
+  });
 }
 
 /**
@@ -249,38 +307,9 @@ Level: ${config.langLevel}
 function handleLangChange(msg) {
   const chatId = msg.chat.id;
 
-  _bot.sendMessage(chatId, "Choose language:", {
+  _bot.sendMessage(chatId, "⚙️ Choose language", {
     reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text: languages["en-uk"].label,
-            callback_data: commands.CHANGE_LANG + ":en-uk",
-          },
-          {
-            text: languages["en-us"].label,
-            callback_data: commands.CHANGE_LANG + ":en-us",
-          },
-        ],
-        [
-          {
-            text: languages["de"].label,
-            callback_data: commands.CHANGE_LANG + ":de",
-          },
-        ],
-        [
-          {
-            text: languages["fr"].label,
-            callback_data: commands.CHANGE_LANG + ":fr",
-          },
-        ],
-        [
-          {
-            text: languages["ru"].label,
-            callback_data: commands.CHANGE_LANG + ":ru",
-          },
-        ],
-      ],
+      inline_keyboard: keyboards.chooseLanguage,
     },
   });
 }
@@ -291,22 +320,22 @@ function handleLangChange(msg) {
 function handleLangLevelChange(msg) {
   const chatId = msg.chat.id;
 
-  _bot.sendMessage(chatId, "Choose langugage proficiency level:", {
+  _bot.sendMessage(chatId, "⚙️ Choose langugage proficiency level", {
     reply_markup: {
-      inline_keyboard: [
-        [
-          { text: "A1", callback_data: commands.CHANGE_LANG_LEVEL + ":a1" },
-          { text: "A2", callback_data: commands.CHANGE_LANG_LEVEL + ":a2" },
-        ],
-        [
-          { text: "B1", callback_data: commands.CHANGE_LANG_LEVEL + ":b1" },
-          { text: "B2", callback_data: commands.CHANGE_LANG_LEVEL + ":b2" },
-        ],
-        [
-          { text: "C1", callback_data: commands.CHANGE_LANG_LEVEL + ":c1" },
-          { text: "C2", callback_data: commands.CHANGE_LANG_LEVEL + ":c2" },
-        ],
-      ],
+      inline_keyboard: keyboards.chooseLevel,
+    },
+  });
+}
+
+/**
+ * @param {TelegramBot.Message} msg
+ */
+function handleFormalityChange(msg) {
+  const chatId = msg.chat.id;
+
+  _bot.sendMessage(chatId, "⚙️ Choose formality level", {
+    reply_markup: {
+      inline_keyboard: keyboards.chooseFormality,
     },
   });
 }

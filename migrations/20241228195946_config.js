@@ -7,8 +7,9 @@ exports.up = function (knex) {
     t.increments("id");
     t.timestamps(true, true);
     t.bigInteger("tg_user_id").notNullable().unique();
-    t.string("lang").notNullable().defaultTo("en");
+    t.string("lang").notNullable().defaultTo("en-uk");
     t.string("lang_level").notNullable().defaultTo("b2");
+    t.string("formality").notNullable().defaultTo("informal");
   });
 };
 

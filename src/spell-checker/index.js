@@ -13,6 +13,7 @@ module.exports = {
   getUserConfig,
   setUserLang: dal.setUserLang,
   setUserLangLevel: dal.setUserLangLevel,
+  setUserFormality: dal.setUserFormality,
 };
 
 /**
@@ -50,5 +51,6 @@ async function getUserConfig(userId) {
   return {
     lang: config.lang,
     langLevel: config.lang_level,
+    formality: config.formality,
   };
 }

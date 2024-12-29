@@ -4,6 +4,7 @@ module.exports = {
   createDefaultConfig,
   setUserLang,
   setUserLangLevel,
+  setUserFormality,
   getUserConfig,
 };
 
@@ -23,7 +24,7 @@ async function createDefaultConfig(userId) {
       tg_user_id: userId,
     })
     .into("config")
-    .returning("lang", "lang_level");
+    .returning("lang", "lang_level", "formality");
 }
 
 /**
@@ -60,11 +61,27 @@ async function setUserLangLevel(userId, level) {
 
 /**
  * @param {number} userId
+ * @param {string} formality
+ * @returns {Promise<void>}
+ */
+async function setUserFormality(userId, formality) {
+  await db()
+    .insert({
+      tg_user_id: userId,
+      formality,
+    })
+    .into("config")
+    .onConflict("tg_user_id")
+    .merge();
+}
+
+/**
+ * @param {number} userId
  * @returns {Promise<ConfigRecord>}
  */
 async function getUserConfig(userId) {
   return db()
-    .select("lang", "lang_level")
+    .select("lang", "lang_level", "formality")
     .from("config")
     .where({ tg_user_id: userId })
     .first();
