@@ -10,11 +10,6 @@ const {
 const { createPayment } = require("../subscription/dal");
 
 /**
- * @typedef {import('node-telegram-bot-api').TelegramBot} TelegramBot
- * @typedef {import('node-telegram-bot-api').CallbackQuery} CallbackQuery
- */
-
-/**
  * @type {TelegramBot}
  */
 let _bot;
@@ -106,7 +101,7 @@ function createErrorHandler(errorName) {
 }
 
 /**
- * @param {CallbackQuery} callbackQuery
+ * @param {TelegramBot.CallbackQuery} callbackQuery
  */
 function handleCallbackQuery(callbackQuery) {
   const chatId = callbackQuery.message.chat.id;
@@ -166,7 +161,7 @@ async function handlePrecheckoutQuery(query) {
 }
 
 /**
- * @param {TelegramBot.Message} msg
+ * @param {TelegramBot} msg
  * @returns {Promise<void>}
  */
 async function handleSuccessfulPayment(msg) {

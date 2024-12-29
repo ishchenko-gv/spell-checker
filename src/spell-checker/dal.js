@@ -1,8 +1,5 @@
 const { db } = require("../db");
-
-/**
- * @typedef {import('./typedefs').Config} Config
- */
+const types = require("./types");
 
 module.exports = {
   setUserLang,
@@ -44,7 +41,7 @@ async function setUserLangLevel(userId, level) {
 
 /**
  * @param {number} userId
- * @returns {Promise<Config>}
+ * @returns {Promise<types.Config>}
  */
 async function getUserConfig(userId) {
   const record = await db()

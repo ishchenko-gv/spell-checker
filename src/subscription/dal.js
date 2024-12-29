@@ -1,4 +1,5 @@
 const { db } = require("../db");
+const types = require("./types");
 
 const MAX_FREE_ATTEMPTS = 3;
 
@@ -12,20 +13,6 @@ module.exports = {
   getSubscriptionByUser,
   createPayment,
 };
-
-/**
- * @typedef {import('knex').Knex.QueryBuilder} QueryBuilder
- */
-
-/**
- * @typedef {object} Payment
- * @property {number} userId
- * @property {string} status
- * @property {string} subject
- * @property {string} currency
- * @property {number} amount
- * @property {object} details
- */
 
 /**
  * @param {string} userId
@@ -146,7 +133,7 @@ function getSubscriptionByUser(userId) {
 }
 
 /**
- * @param {Payment} payment
+ * @param {types.Payment} payment
  * @returns {Promise<number>}
  */
 async function createPayment(payment) {
