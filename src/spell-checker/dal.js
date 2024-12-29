@@ -1,11 +1,30 @@
 const { db } = require("../db");
-const types = require("./types");
 
 module.exports = {
+  createDefaultConfig,
   setUserLang,
   setUserLangLevel,
   getUserConfig,
 };
+
+/**
+ * @typedef {object} ConfigRecord
+ * @property {string} lang
+ * @property {string} lang_level
+ */
+
+/**
+ * @param {number} userId
+ * @returns {Promise<ConfigRecord>}
+ */
+async function createDefaultConfig(userId) {
+  return db()
+    .insert({
+      tg_user_id: userId,
+    })
+    .into("config")
+    .returning("lang", "lang_level");
+}
 
 /**
  * @param {number} userId
@@ -41,17 +60,12 @@ async function setUserLangLevel(userId, level) {
 
 /**
  * @param {number} userId
- * @returns {Promise<types.Config>}
+ * @returns {Promise<ConfigRecord>}
  */
 async function getUserConfig(userId) {
-  const record = await db()
+  return db()
     .select("lang", "lang_level")
     .from("config")
     .where({ tg_user_id: userId })
     .first();
-
-  return {
-    lang: record.lang,
-    langLevel: record.lang_level,
-  };
 }

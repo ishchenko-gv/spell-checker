@@ -1,6 +1,10 @@
 const TelegramBot = require("node-telegram-bot-api");
 
-const { checkSpelling } = require("../spell-checker");
+const {
+  checkSpelling,
+  setUserLang,
+  getUserConfig,
+} = require("../spell-checker");
 const {
   checkFreeAttempts,
   validatePlanSlug,
@@ -15,8 +19,9 @@ const { createPayment } = require("../subscription/dal");
 let _bot;
 
 const commands = {
-  SUBSCRIBE_MONTH: "subscribe_month",
-  SUBSCRIBE_YEAR: "subscribe_year",
+  SUBSCRIBE: "subscribe",
+  CHANGE_LANG: "change-lang",
+  CHANGE_LANG_LEVEL: "change-lang-level",
 };
 
 module.exports = {
@@ -40,6 +45,8 @@ function runTelegramBot() {
   _bot.on("pre_checkout_query", handlePrecheckoutQuery);
   _bot.on("successful_payment", handleSuccessfulPayment);
   _bot.onText(/\/me/, handleAboutMe);
+  _bot.onText(/\/settings/, handleShowSettings);
+  _bot.onText(/\/lang/, handleLangChange);
 
   if (process.env.NODE_ENV === "development") {
     _bot.onText(/\/test_offer/, offerSubscription);
@@ -104,16 +111,21 @@ function createErrorHandler(errorName) {
 /**
  * @param {TelegramBot.CallbackQuery} callbackQuery
  */
-function handleCallbackQuery(callbackQuery) {
+async function handleCallbackQuery(callbackQuery) {
   const chatId = callbackQuery.message.chat.id;
-  const command = callbackQuery.data;
+  const [command, data] = callbackQuery.data.split(":");
 
   switch (command) {
-    case commands.SUBSCRIBE_MONTH:
-      _bot.sendInvoice(...Object.values(getMonthSubscriptionInvoice(chatId)));
+    case commands.SUBSCRIBE:
+      if (data === "month") {
+        _bot.sendInvoice(...Object.values(getMonthSubscriptionInvoice(chatId)));
+      } else {
+        _bot.sendInvoice(...Object.values(getYearSubscriptionInvoice(chatId)));
+      }
       break;
-    case commands.SUBSCRIBE_YEAR:
-      _bot.sendInvoice(...Object.values(getYearSubscriptionInvoice(chatId)));
+    case commands.CHANGE_LANG:
+      await setUserLang(chatId, data);
+      _bot.sendMessage(chatId, `Your language's been set to ${data}`);
       break;
     default:
       console.error("Unknown callback query:", command);
@@ -207,14 +219,75 @@ function handleAboutMe(msg) {
 /**
  * @param {TelegramBot.Message} msg
  */
+async function handleShowSettings(msg) {
+  const userId = msg.from.id;
+  const chatId = msg.chat.id;
+
+  const config = await getUserConfig(userId);
+
+  const response = `
+Language: ${config.lang}
+Level: ${config.langLevel}
+  `;
+
+  _bot.sendMessage(chatId, response);
+}
+
+/**
+ * @param {TelegramBot.Message} msg
+ */
+function handleLangChange(msg) {
+  const chatId = msg.chat.id;
+
+  _bot.sendMessage(chatId, "Choose language:", {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: "English (UK)",
+            callback_data: commands.CHANGE_LANG + ":en-uk",
+          },
+        ],
+        [
+          {
+            text: "English (US)",
+            callback_data: commands.CHANGE_LANG + ":en-us",
+          },
+        ],
+        [
+          {
+            text: "German",
+            callback_data: commands.CHANGE_LANG + ":de",
+          },
+        ],
+        [
+          {
+            text: "French",
+            callback_data: commands.CHANGE_LANG + ":fr",
+          },
+        ],
+        [
+          {
+            text: "Russian",
+            callback_data: commands.CHANGE_LANG + ":ru",
+          },
+        ],
+      ],
+    },
+  });
+}
+
+/**
+ * @param {TelegramBot.Message} msg
+ */
 function offerSubscription(msg) {
   const chatId = msg.chat.id;
 
   _bot.sendMessage(chatId, "Choose subscription plan:", {
     reply_markup: {
       inline_keyboard: [
-        [{ text: "1 month", callback_data: commands.SUBSCRIBE_MONTH }],
-        [{ text: "12 months", callback_data: commands.SUBSCRIBE_YEAR }],
+        [{ text: "1 month", callback_data: commands.SUBSCRIBE + ":month" }],
+        [{ text: "12 months", callback_data: commands.SUBSCRIBE + ":year" }],
       ],
     },
   });

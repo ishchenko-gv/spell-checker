@@ -44,7 +44,9 @@ async function createAttemptsForUser(userId) {
       last_attempt_ts: db().fn.now(),
       updated_at: db().fn.now(),
     })
-    .into("free_attempts");
+    .into("free_attempts")
+    .onConflict("tg_user_id")
+    .merge();
 
   return MAX_FREE_ATTEMPTS;
 }
