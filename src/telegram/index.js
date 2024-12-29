@@ -4,6 +4,7 @@ const {
   checkSpelling,
   setUserLang,
   getUserConfig,
+  setUserLangLevel,
 } = require("../spell-checker");
 const {
   checkFreeAttempts,
@@ -12,6 +13,7 @@ const {
   checkUserSubscription,
 } = require("../subscription");
 const { createPayment } = require("../subscription/dal");
+const languages = require("../spell-checker/languages");
 
 /**
  * @type {TelegramBot}
@@ -47,6 +49,7 @@ function runTelegramBot() {
   _bot.onText(/\/me/, handleAboutMe);
   _bot.onText(/\/settings/, handleShowSettings);
   _bot.onText(/\/lang/, handleLangChange);
+  _bot.onText(/\/level/, handleLangLevelChange);
 
   if (process.env.NODE_ENV === "development") {
     _bot.onText(/\/test_offer/, offerSubscription);
@@ -125,7 +128,14 @@ async function handleCallbackQuery(callbackQuery) {
       break;
     case commands.CHANGE_LANG:
       await setUserLang(chatId, data);
-      _bot.sendMessage(chatId, `Your language's been set to ${data}`);
+      _bot.sendMessage(
+        chatId,
+        `The language's been set to ${languages[data].label || ""}`
+      );
+      break;
+    case commands.CHANGE_LANG_LEVEL:
+      await setUserLangLevel(chatId, data);
+      _bot.sendMessage(chatId, `The language level's been set to ${data}`);
       break;
     default:
       console.error("Unknown callback query:", command);
@@ -244,33 +254,57 @@ function handleLangChange(msg) {
       inline_keyboard: [
         [
           {
-            text: "English (UK)",
+            text: languages["en-uk"].label,
             callback_data: commands.CHANGE_LANG + ":en-uk",
           },
-        ],
-        [
           {
-            text: "English (US)",
+            text: languages["en-us"].label,
             callback_data: commands.CHANGE_LANG + ":en-us",
           },
         ],
         [
           {
-            text: "German",
+            text: languages["de"].label,
             callback_data: commands.CHANGE_LANG + ":de",
           },
         ],
         [
           {
-            text: "French",
+            text: languages["fr"].label,
             callback_data: commands.CHANGE_LANG + ":fr",
           },
         ],
         [
           {
-            text: "Russian",
+            text: languages["ru"].label,
             callback_data: commands.CHANGE_LANG + ":ru",
           },
+        ],
+      ],
+    },
+  });
+}
+
+/**
+ * @param {TelegramBot.Message} msg
+ */
+function handleLangLevelChange(msg) {
+  const chatId = msg.chat.id;
+
+  _bot.sendMessage(chatId, "Choose langugage proficiency level:", {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: "A1", callback_data: commands.CHANGE_LANG_LEVEL + ":a1" },
+          { text: "A2", callback_data: commands.CHANGE_LANG_LEVEL + ":a2" },
+        ],
+        [
+          { text: "B1", callback_data: commands.CHANGE_LANG_LEVEL + ":b1" },
+          { text: "B2", callback_data: commands.CHANGE_LANG_LEVEL + ":b2" },
+        ],
+        [
+          { text: "C1", callback_data: commands.CHANGE_LANG_LEVEL + ":c1" },
+          { text: "C2", callback_data: commands.CHANGE_LANG_LEVEL + ":c2" },
         ],
       ],
     },
