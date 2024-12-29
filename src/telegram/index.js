@@ -39,6 +39,7 @@ function runTelegramBot() {
   _bot.on("callback_query", handleCallbackQuery);
   _bot.on("pre_checkout_query", handlePrecheckoutQuery);
   _bot.on("successful_payment", handleSuccessfulPayment);
+  _bot.onText(/\/me/, handleAboutMe);
 
   if (process.env.NODE_ENV === "development") {
     _bot.onText(/\/test_offer/, offerSubscription);
@@ -187,6 +188,20 @@ async function handleSuccessfulPayment(msg) {
     console.error(err);
     _bot.sendMessage(chatId, "Something went wrong. Couldn't process payment");
   }
+}
+
+/**
+ * @param {TelegramBot.Message} msg
+ */
+function handleAboutMe(msg) {
+  const chatId = msg.chat.id;
+  const userId = msg.from.id;
+
+  const response = `
+    user id: ${userId}
+  `;
+
+  _bot.sendMessage(chatId, response);
 }
 
 /**
