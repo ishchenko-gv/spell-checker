@@ -19,7 +19,6 @@ const keyboards = require("./keyboards");
 const languages = require("../spell-checker/languages");
 const langLevels = require("../spell-checker/lang-levels");
 const formalities = require("../spell-checker/formalities");
-// const formalities = require("../spell-checker/formalities");
 
 /**
  * @type {TelegramBot}
@@ -46,6 +45,7 @@ function runTelegramBot() {
   _bot.on("callback_query", handleCallbackQuery);
   _bot.on("pre_checkout_query", handlePrecheckoutQuery);
   _bot.on("successful_payment", handleSuccessfulPayment);
+
   _bot.onText(/\/me/, handleAboutMe);
   _bot.onText(/\/settings/, handleShowSettings);
   _bot.onText(/\/lang/, handleLangChange);
@@ -97,7 +97,7 @@ async function handleMessage(msg) {
     _bot.sendMessage(chatId, "❌ Something went wrong. Couldn't read message");
   }
 
-  const answer = await checkSpelling(msg.text);
+  const answer = await checkSpelling(userId, msg.text);
 
   _bot.sendMessage(chatId, answer);
 }
@@ -320,7 +320,7 @@ function handleLangChange(msg) {
 function handleLangLevelChange(msg) {
   const chatId = msg.chat.id;
 
-  _bot.sendMessage(chatId, "⚙️ Choose langugage proficiency level", {
+  _bot.sendMessage(chatId, "⚙️ Choose language proficiency level", {
     reply_markup: {
       inline_keyboard: keyboards.chooseLevel,
     },

@@ -54,32 +54,30 @@ const chooseLanguage = [
 const chooseLevel = [
   [
     {
-      text: `${langLevels.a1.emoji} ${langLevels.a1.label}`,
-      callback_data: commands.CHANGE_LANG_LEVEL + ":a1",
+      text: `${langLevels.b2.emoji} ${langLevels.b2.label}`,
+      callback_data: commands.CHANGE_LANG_LEVEL + ":b2",
     },
     {
-      text: `${langLevels.a2.emoji} ${langLevels.a2.label}`,
-      callback_data: commands.CHANGE_LANG_LEVEL + ":a2",
+      text: `${langLevels.c1.emoji} ${langLevels.c1.label}`,
+      callback_data: commands.CHANGE_LANG_LEVEL + ":c1",
     },
   ],
   [
+    {
+      text: `${langLevels.c2.emoji} ${langLevels.c2.label}`,
+      callback_data: commands.CHANGE_LANG_LEVEL + ":c2",
+    },
     {
       text: `${langLevels.b1.emoji} ${langLevels.b1.label}`,
       callback_data: commands.CHANGE_LANG_LEVEL + ":b1",
     },
     {
-      text: `${langLevels.b2.emoji} ${langLevels.b2.label}`,
-      callback_data: commands.CHANGE_LANG_LEVEL + ":b2",
-    },
-  ],
-  [
-    {
-      text: `${langLevels.c1.emoji} ${langLevels.c1.label}`,
-      callback_data: commands.CHANGE_LANG_LEVEL + ":c1",
+      text: `${langLevels.a2.emoji} ${langLevels.a2.label}`,
+      callback_data: commands.CHANGE_LANG_LEVEL + ":a2",
     },
     {
-      text: `${langLevels.c2.emoji} ${langLevels.c2.label}`,
-      callback_data: commands.CHANGE_LANG_LEVEL + ":c2",
+      text: `${langLevels.a1.emoji} ${langLevels.a1.label}`,
+      callback_data: commands.CHANGE_LANG_LEVEL + ":a1",
     },
   ],
 ];

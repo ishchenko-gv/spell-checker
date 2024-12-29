@@ -8,7 +8,8 @@ const { getRandomUserId } = require("./utils");
 
 describe("spell-checker", () => {
   it("should check the spelling using OpenAI api", async () => {
-    const response = await checkSpelling("Hello there!");
+    const userId = getRandomUserId();
+    const response = await checkSpelling(userId, "Hello there!");
 
     console.info("OpenAI response:", response);
 
