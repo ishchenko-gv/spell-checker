@@ -16,9 +16,9 @@ const {
 const { createPayment } = require("../subscription/dal");
 const commands = require("./commands");
 const keyboards = require("./keyboards");
-const languages = require("../spell-checker/languages");
-const langLevels = require("../spell-checker/lang-levels");
-const formalities = require("../spell-checker/formalities");
+const languages = require("../data/languages");
+const langLevels = require("../data/lang-levels");
+const formalities = require("../data/formalities");
 
 /**
  * @type {TelegramBot}
@@ -48,9 +48,9 @@ function runTelegramBot() {
 
   _bot.onText(/\/me/, handleAboutMe);
   _bot.onText(/\/settings/, handleShowSettings);
-  _bot.onText(/\/lang/, handleLangChange);
-  _bot.onText(/\/level/, handleLangLevelChange);
-  _bot.onText(/\/formality/, handleFormalityChange);
+  _bot.onText(/\/lang/, showLangChangeMenu);
+  _bot.onText(/\/level/, showLangLevelChangeMenu);
+  _bot.onText(/\/formality/, showFormalityChangeMenu);
 
   if (process.env.NODE_ENV === "development") {
     _bot.onText(/\/test_offer/, offerSubscription);
@@ -132,7 +132,7 @@ async function handleCallbackQuery(callbackQuery) {
       break;
     case commands.CHANGE_LANG:
       if (!data) {
-        handleLangChange(callbackQuery.message);
+        showLangChangeMenu(callbackQuery.message);
         break;
       }
 
@@ -149,7 +149,7 @@ async function handleCallbackQuery(callbackQuery) {
       break;
     case commands.CHANGE_LANG_LEVEL:
       if (!data) {
-        handleLangLevelChange(callbackQuery.message);
+        showLangLevelChangeMenu(callbackQuery.message);
         break;
       }
 
@@ -166,7 +166,7 @@ async function handleCallbackQuery(callbackQuery) {
       break;
     case commands.CHANGE_FORMALITY:
       if (!data) {
-        handleFormalityChange(callbackQuery.message);
+        showFormalityChangeMenu(callbackQuery.message);
         break;
       }
 
@@ -304,7 +304,7 @@ formality: ${formalities[config.formality].label} ${
 /**
  * @param {TelegramBot.Message} msg
  */
-function handleLangChange(msg) {
+function showLangChangeMenu(msg) {
   const chatId = msg.chat.id;
 
   _bot.sendMessage(chatId, "⚙️ Choose language", {
@@ -317,7 +317,7 @@ function handleLangChange(msg) {
 /**
  * @param {TelegramBot.Message} msg
  */
-function handleLangLevelChange(msg) {
+function showLangLevelChangeMenu(msg) {
   const chatId = msg.chat.id;
 
   _bot.sendMessage(chatId, "⚙️ Choose language proficiency level", {
@@ -330,7 +330,7 @@ function handleLangLevelChange(msg) {
 /**
  * @param {TelegramBot.Message} msg
  */
-function handleFormalityChange(msg) {
+function showFormalityChangeMenu(msg) {
   const chatId = msg.chat.id;
 
   _bot.sendMessage(chatId, "⚙️ Choose formality level", {

@@ -1,8 +1,8 @@
 const { sendMessages } = require("../openai");
 const dal = require("./dal");
-const formalities = require("./formalities");
-const langLevels = require("./lang-levels");
-const languages = require("./languages");
+const formalities = require("../data/formalities");
+const langLevels = require("../data/lang-levels");
+const languages = require("../data/languages");
 const types = require("./types");
 
 const BEHAVIOR_PROMPT = `

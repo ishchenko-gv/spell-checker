@@ -1,7 +1,7 @@
 const commands = require("./commands");
-const languages = require("../spell-checker/languages");
-const langLevels = require("../spell-checker/lang-levels");
-const formalities = require("../spell-checker/formalities");
+const languages = require("../data/languages");
+const langLevels = require("../data/lang-levels");
+const formalities = require("../data/formalities");
 
 const showSettings = [
   [
