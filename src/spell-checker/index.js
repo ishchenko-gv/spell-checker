@@ -55,8 +55,11 @@ async function getUserConfig(userId) {
   let config = await dal.getUserConfig(userId);
 
   if (!config) {
-    config = await dal.createDefaultConfig(userId);
+    const res = await dal.createDefaultConfig(userId);
+    config = res[0];
   }
+
+	console.log('config: ', config)
 
   return {
     lang: config.lang,

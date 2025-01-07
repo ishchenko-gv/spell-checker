@@ -24,7 +24,7 @@ async function createDefaultConfig(userId) {
       tg_user_id: userId,
     })
     .into("config")
-    .returning("lang", "lang_level", "formality");
+    .returning(["lang", "lang_level", "formality"]);
 }
 
 /**
