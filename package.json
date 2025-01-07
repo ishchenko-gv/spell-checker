@@ -6,7 +6,8 @@
     "dev": "NODE_ENV=development npx nodemon src/index.js",
     "test": "jest",
     "test:watch": "jest --watch",
-    "lint": "eslint src/**/*.js"
+    "lint": "eslint src/**/*.js",
+    "migrate": "NODE_ENV=production NODE_TLS_REJECT_UNAUTHORIZED=0 npx knex migrate:latest"
   },
   "keywords": [],
   "author": "",

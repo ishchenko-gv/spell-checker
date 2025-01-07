@@ -1,4 +1,8 @@
+const fs = require("fs");
+
 require("dotenv").config();
+
+const certFile = fs.readFileSync("./cert.crt");
 
 /**
  * @type { {[key: string]: import("knex").Knex.Config} }
@@ -42,5 +46,9 @@ module.exports = {
     migrations: {
       tableName: "knex_migrations",
     },
+    ssl: {
+	ca: certFile.toString(),
+	rejectUnauthorized: false,
+    }
   },
 };
